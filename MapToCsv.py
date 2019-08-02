@@ -13,9 +13,13 @@ gra_file = open(sys.argv[1], "r")
 #open output file
 #---output_file = open(sys.argv[2], "w")
 
+#10 Declare variable de etat - initialization - boolean variable
+# must_print=False and must_print=True 
+must_print=False
 #loop until end of file
 while True:
 	# read velue from input file
+#-------- JE LIS LA LIGNE ------------------
 	line = gra_file.readline()
 	# 1 rstrip - remove invisble in the ascci file
 	# 2 line is a variable which contain one line on the file NR
@@ -30,16 +34,33 @@ while True:
 # 6 test
 	#print (split_line)
 
+
+#JE REGARDE SI JE DOIS IMPRIME LA LIGNE
+
 	#7 to find site in the array
 	if split_line[0]=="Site:": 
-		print (line)
+		print (line.rstrip())
+		must_print=False
+	#8 to find Intensity in the array
 	if split_line[0]=="Intensity":
+		must_print=False
+		#9 to find T=.... in the array
 		if (split_line[4]=="T=0.000"):
+			must_print=True
 			print (split_line[4])
 		if (split_line[4]=="T=0.200"):
+			must_print=True
 			print (split_line[4])
 		if (split_line[4]=="T=1.000"):
+			must_print=True
 			print (split_line[4])
+	# Boolean Variable execute when must_print=True and it should be declare as
+	# must_print==True beacause I test value 
+	# SI JE DOIS IMPRIME LA LIGNE
+	if must_print==True:
+		#JE IMPRIME LA LIGNE
+		print (line.rstrip())
+
 
 
 		
