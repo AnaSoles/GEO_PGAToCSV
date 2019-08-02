@@ -32,7 +32,17 @@ while True:
 
 	#7 to find site in the array
 	if split_line[0]=="Site:": 
-		print ("found" )
+		print (line)
+	if split_line[0]=="Intensity":
+		if (split_line[4]=="T=0.000"):
+			print (split_line[4])
+		if (split_line[4]=="T=0.200"):
+			print (split_line[4])
+		if (split_line[4]=="T=1.000"):
+			print (split_line[4])
+
+
+		
 
 
 	 #longitude = input_file.readline().rstrip()
