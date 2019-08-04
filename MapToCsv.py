@@ -97,8 +97,9 @@ while True:
 		print (line.rstrip())
 		if len(split_line)<5:
 			# First colum and line start with 0; (raw,column,value to add)
-			current_sheet.write(curent_line,0,split_line[0])
-			current_sheet.write(curent_line,1,split_line[2])
+			# float to recognize number with decimal 
+			current_sheet.write(curent_line,0,(float)(split_line[0]))
+			current_sheet.write(curent_line,1,(float)(split_line[2]))
 			curent_line=curent_line + 1
 
 
