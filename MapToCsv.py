@@ -1,5 +1,6 @@
 import sys
-
+# xlwt is a library to export and work in excel sheet
+import xlwt
 # this are the arguments passed to the script
 # argv[0] is the name of the script
 # argv[1] is the name of input file
@@ -13,9 +14,23 @@ gra_file = open(sys.argv[1], "r")
 #open output file
 #---output_file = open(sys.argv[2], "w")
 
+# 11 Create a excel Sheet
+workbook = xlwt.Workbook(encoding="UTF-8")
+# 12 Object "sheet_amsv" to create a sheet in the excel workwook called "AMSV1". An object is to do action on it.
+sheet_amsv1 = workbook.add_sheet('AMSV1')
+sheet_amsv2 = workbook.add_sheet('AMSV2')
+
+# 13 write the value in your sheet - first colum and line start with 0; (raw,column,value to add)
+sheet_amsv1.write(2,0,"value1")
+sheet_amsv2.write(2,0,"value2")
+
+
+
 #10 Declare variable de etat - initialization - boolean variable
 # must_print=False and must_print=True 
 must_print=False
+
+#--------------------  LOOP FOR EACH LINE IN THE .GRA FILE----------------------------------
 #loop until end of file
 while True:
 	# read velue from input file
@@ -82,5 +97,6 @@ while True:
 	# output_file.write(latitude);
 	# output_file.write(" ");
 	# output_file.write("\n");
+workbook.save('EXC_AMSV.xls')
 
 print ("end..")
