@@ -29,8 +29,12 @@ workbook = xlwt.Workbook(encoding="UTF-8")
 #10 initialization de variable de etat - boolean variable
 # must_print=False and must_print=True 
 must_print=False
-# Initialization de variable
+# Initialization of variable
 CITY="Uknown"
+# Initialization of variable object - to read each sheet in the during the loop
+current_sheet=None
+# Initialization of variable to print results in the sheet
+curent_line=0
 #--------------------  LOOP FOR EACH LINE IN THE .GRA FILE----------------------------------
 #loop until end of file
 while True:
@@ -66,23 +70,27 @@ while True:
 		#9 to find T=.... in the array
 		if (split_line[4]=="T=0.000"):
 			must_print=True
-			sheet_amsv1 = workbook.add_sheet(CITY+'_'+"T000")
+			current_sheet = workbook.add_sheet(CITY+'_'+"T000")
+			curent_line=0
 			print (split_line[4])
 		if (split_line[4]=="T=0.200"):
 			must_print=True
-			sheet_amsv1 = workbook.add_sheet(CITY+'_'+"T020")
+			current_sheet = workbook.add_sheet(CITY+'_'+"T020")
 			print (split_line[4])
+			curent_line=0
 		if (split_line[4]=="T=1.000"):
 			must_print=True
-			sheet_amsv1 = workbook.add_sheet(CITY+'_'+"T100")
+			current_sheet = workbook.add_sheet(CITY+'_'+"T100")
 			print (split_line[4])
+			curent_line=0
 	# Boolean Variable execute when must_print=True and it should be declare as
 	# must_print==True beacause I test value 
 	# SI JE DOIS IMPRIME LA LIGNE
 	if must_print==True:
 		#JE IMPRIME LA LIGNE
 		print (line.rstrip())
-
+		current_sheet.write(curent_line,0,line.rstrip())
+		curent_line=curent_line + 1
 
 
 workbook.save('EXC_AMSV.xls')
