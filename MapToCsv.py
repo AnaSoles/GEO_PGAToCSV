@@ -17,19 +17,20 @@ gra_file = open(sys.argv[1], "r")
 # 11 Create a excel Sheet
 workbook = xlwt.Workbook(encoding="UTF-8")
 # 12 Object "sheet_amsv" to create a sheet in the excel workwook called "AMSV1". An object is to do action on it.
-sheet_amsv1 = workbook.add_sheet('AMSV1')
-sheet_amsv2 = workbook.add_sheet('AMSV2')
+#sheet_amsv1 = workbook.add_sheet('AMSV1')
+#sheet_amsv2 = workbook.add_sheet('AMSV2')
 
 # 13 write the value in your sheet - first colum and line start with 0; (raw,column,value to add)
-sheet_amsv1.write(2,0,"value1")
-sheet_amsv2.write(2,0,"value2")
+#sheet_amsv1.write(2,0,"value1")
+#sheet_amsv2.write(2,0,"value2")
 
 
 
-#10 Declare variable de etat - initialization - boolean variable
+#10 initialization de variable de etat - boolean variable
 # must_print=False and must_print=True 
 must_print=False
-
+# Initialization de variable
+CITY="Uknown"
 #--------------------  LOOP FOR EACH LINE IN THE .GRA FILE----------------------------------
 #loop until end of file
 while True:
@@ -55,6 +56,9 @@ while True:
 	#7 to find site in the array
 	if split_line[0]=="Site:": 
 		print (line.rstrip())
+		print (split_line[16])
+		# Create a VARIABLE to save CITY
+		CITY=split_line[16]
 		must_print=False
 	#8 to find Intensity in the array
 	if split_line[0]=="Intensity":
@@ -62,12 +66,15 @@ while True:
 		#9 to find T=.... in the array
 		if (split_line[4]=="T=0.000"):
 			must_print=True
+			sheet_amsv1 = workbook.add_sheet(CITY+'_'+"T000")
 			print (split_line[4])
 		if (split_line[4]=="T=0.200"):
 			must_print=True
+			sheet_amsv1 = workbook.add_sheet(CITY+'_'+"T020")
 			print (split_line[4])
 		if (split_line[4]=="T=1.000"):
 			must_print=True
+			sheet_amsv1 = workbook.add_sheet(CITY+'_'+"T100")
 			print (split_line[4])
 	# Boolean Variable execute when must_print=True and it should be declare as
 	# must_print==True beacause I test value 
@@ -78,25 +85,6 @@ while True:
 
 
 
-		
-
-
-	 #longitude = input_file.readline().rstrip()
-	# if len(longitude) == 0:
-	# 	break
-	# latitude = input_file.readline().rstrip()
-	# if len(latitude) == 0:
-	# 	break
-	# # print values on screen
-	# print(name)
-	# print(longitude)
-	# print(latitude)
-	# # write into file
-	# output_file.write(longitude);
-	# output_file.write(" ");
-	# output_file.write(latitude);
-	# output_file.write(" ");
-	# output_file.write("\n");
 workbook.save('EXC_AMSV.xls')
 
 print ("end..")
