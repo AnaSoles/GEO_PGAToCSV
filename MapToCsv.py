@@ -71,18 +71,24 @@ while True:
 		if (split_line[4]=="T=0.000"):
 			must_print=True
 			current_sheet = workbook.add_sheet(CITY+'_'+"T000")
-			curent_line=0
+			current_sheet.write(0,0,"X")
+			current_sheet.write(0,1,"Y")
+			curent_line=1
 			print (split_line[4])
 		if (split_line[4]=="T=0.200"):
 			must_print=True
 			current_sheet = workbook.add_sheet(CITY+'_'+"T020")
+			current_sheet.write(0,0,"X")
+			current_sheet.write(0,1,"Y")
 			print (split_line[4])
-			curent_line=0
+			curent_line=1
 		if (split_line[4]=="T=1.000"):
 			must_print=True
 			current_sheet = workbook.add_sheet(CITY+'_'+"T100")
+			current_sheet.write(0,0,"X")
+			current_sheet.write(0,1,"Y")
 			print (split_line[4])
-			curent_line=0
+			curent_line=1
 	# Boolean Variable execute when must_print=True and it should be declare as
 	# must_print==True beacause I test value 
 	# SI JE DOIS IMPRIME LA LIGNE
