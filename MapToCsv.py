@@ -89,8 +89,11 @@ while True:
 	if must_print==True:
 		#JE IMPRIME LA LIGNE
 		print (line.rstrip())
-		current_sheet.write(curent_line,0,line.rstrip())
-		curent_line=curent_line + 1
+		if len(split_line)<5:
+			# First colum and line start with 0; (raw,column,value to add)
+			current_sheet.write(curent_line,0,split_line[0])
+			current_sheet.write(curent_line,1,split_line[2])
+			curent_line=curent_line + 1
 
 
 workbook.save('EXC_AMSV.xls')
