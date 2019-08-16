@@ -7,21 +7,44 @@ import xlsxwriter
 # 							Create graph for excel
 #------------------------------------------------------------------------------------
 
-def create_graph(workbook, worksheet, nblines):
-	if worksheet==None:
-		return;
+cities = [];
+
+def create_graph(workbook, city, footer):
+
+	nblines = 10
+
+	worksheet = workbook.get_worksheet_by_name(reduce_name(city, footer));
 
 	# Create a chart object. Type is kind of graph, scatter is line
 	chart = workbook.add_chart({'type': 'line'})
 
 	# # Configure the series of the chart from the dataframe data.
 	chart.add_series({
-		'name': "test",
+		'name': "B",
 	 	# X value
-	 	# 'categories': '=Sheet1!$A$1:$A$5',
 	 	'categories': [worksheet.name, 1, 2, nblines, 2],
 	 	# Y value
 	 	'values': [worksheet.name, 1, 1, nblines, 1],
+
+	 	'marker': {'type': 'automatic'},
+	 	'line':   {'width': 1.5},
+	})
+	chart.add_series({
+		'name': "C",
+	 	# X value
+	 	'categories': [worksheet.name, 1, 6, nblines, 6],
+	 	# Y value
+	 	'values': [worksheet.name, 1, 5, nblines, 5],
+
+	 	'marker': {'type': 'automatic'},
+	 	'line':   {'width': 1.5},
+	})
+	chart.add_series({
+		'name': "D",
+	 	# X value
+	 	'categories': [worksheet.name, 1, 10, nblines, 10],
+	 	# Y value
+	 	'values': [worksheet.name, 1, 9, nblines, 9],
 
 	 	'marker': {'type': 'automatic'},
 	 	'line':   {'width': 1.5},
@@ -64,7 +87,12 @@ def create_graph(workbook, worksheet, nblines):
 
 	# # # Insert the chart into the worksheet.
 	# print("***********" + worksheet.name)
-	worksheet.insert_chart(1, 4, chart)
+	worksheet.insert_chart(nblines + 2, 3, chart)
+
+def add_city(city):
+	global cities
+	if (city not in cities):
+		cities.append(city)
 
 def reduce_name(city, footer):
 	# sheet name cannot be greater than 30 characters.
@@ -72,8 +100,8 @@ def reduce_name(city, footer):
 	result = result +'_'+ footer
 	return result;
 
-def parse_gra_file(workbook, filename):
-	gra_file = open(sys.argv[1], "r")
+def parse_gra_file(workbook, category, filename, current_column):
+	gra_file = open(filename, "r")
 	#10 initialization de variable de etat - boolean variable
 	# must_print=False and must_print=True 
 	must_print=False
@@ -118,32 +146,41 @@ def parse_gra_file(workbook, filename):
 			#9 to find T=.... in the array
 			if (split_line[4]=="T=0.000"):
 				must_print=True
-				create_graph(workbook, current_sheet, curent_line-1)
-				current_sheet = workbook.add_worksheet(reduce_name(CITY, "T000"))
-				current_sheet.write(0,0,"X")
-				current_sheet.write(0,1,"Y (1/anos)")
+				worksheet_name = reduce_name(CITY, "T000")
+				current_sheet = workbook.get_worksheet_by_name(worksheet_name);
+				if (current_sheet==None):
+					current_sheet = workbook.add_worksheet(worksheet_name)
+				current_sheet.write(0,current_column + 0,"X")
+				current_sheet.write(0,current_column + 1,"Y (1/anos)")
 				# X - X/981
-				current_sheet.write(0,2,"Aceleracion Spectral (gals)")
+				current_sheet.write(0,current_column + 2,"Aceleracion Spectral (gals)")
 				curent_line=1
 				print (split_line[4])
+				add_city(CITY)
 			if (split_line[4]=="T=0.200"):
 				must_print=True
-				create_graph(workbook, current_sheet, curent_line-1)
-				current_sheet = workbook.add_worksheet(reduce_name(CITY, "T020"))
-				current_sheet.write(0,0,"X (gals)")
-				current_sheet.write(0,1,"Y")
-				current_sheet.write(0,2,"Aceleracion Spectral (gals)")
+				worksheet_name = reduce_name(CITY, "T020")
+				current_sheet = workbook.get_worksheet_by_name(worksheet_name);
+				if (current_sheet==None):
+					current_sheet = workbook.add_worksheet(worksheet_name)
+				current_sheet.write(0,current_column + 0,"X (gals)")
+				current_sheet.write(0,current_column + 1,"Y")
+				current_sheet.write(0,current_column + 2,"Aceleracion Spectral (gals)")
 				print (split_line[4])
 				curent_line=1
+				add_city(CITY)
 			if (split_line[4]=="T=1.000"):
 				must_print=True
-				create_graph(workbook, current_sheet, curent_line-1)
-				current_sheet = workbook.add_worksheet(reduce_name(CITY, "T100"))
-				current_sheet.write(0,0,"Aceleracion Spectral (gals)")
-				current_sheet.write(0,1,"Frecuencia Anual de Excedencia (1/anos)")
-				current_sheet.write(0,2,"Aceleracion Spectral (gals)")
+				worksheet_name = reduce_name(CITY, "T100")
+				current_sheet = workbook.get_worksheet_by_name(worksheet_name);
+				if (current_sheet==None):
+					current_sheet = workbook.add_worksheet(worksheet_name)
+				current_sheet.write(0,current_column + 0,"Aceleracion Spectral (gals)")
+				current_sheet.write(0,current_column + 1,"Frecuencia Anual de Excedencia (1/anos)")
+				current_sheet.write(0,current_column + 2,"Aceleracion Spectral (gals)")
 				print (split_line[4])
 				curent_line=1
+				add_city(CITY)
 		# Boolean Variable execute when must_print=True and it should be declare as
 		# must_print==True beacause I test value 
 		# SI JE DOIS IMPRIME LA LIGNE
@@ -153,13 +190,10 @@ def parse_gra_file(workbook, filename):
 			if len(split_line)<5:
 				# First colum and line start with 0; (raw,column,value to add)
 				# float to recognize number with decimal 
-				current_sheet.write(curent_line,0,(float)(split_line[0]))
-				current_sheet.write(curent_line,1,(float)(split_line[2]))
-				current_sheet.write(curent_line,2,(float)(split_line[0])/981)
+				current_sheet.write(curent_line, current_column + 0,(float)(split_line[0]))
+				current_sheet.write(curent_line, current_column + 1,(float)(split_line[2]))
+				current_sheet.write(curent_line, current_column + 2,(float)(split_line[0])/981)
 				curent_line=curent_line + 1
-
-	#write the last graph
-	create_graph(workbook, current_sheet, curent_line-1)
 
 #------------------------------------------------------------------------------------
 #------------------------------------------------------------------------------------
@@ -170,6 +204,11 @@ def parse_gra_file(workbook, filename):
 # argv[2] is the name of output file
 print( 'Number of arguments:', len(sys.argv), 'arguments.')
 print( 'Argument List:', str(sys.argv))
+
+if (len(sys.argv)<4):
+	print "Error - wrong parameters"
+	print "Usage: " + sys.argv[0] + " GRA_B.gra GRA_C.gra GRA_D.gra"
+	exit(1)
 
 # 11 Create a excel Sheet - WORKBOOK 
 workbook = xlsxwriter.Workbook('EXC_AMSV.xlsx')
@@ -182,8 +221,17 @@ workbook = xlsxwriter.Workbook('EXC_AMSV.xlsx')
 #sheet_amsv2.write(2,0,"value2")
 
 # open input file
-parse_gra_file(workbook, sys.argv[0])
+parse_gra_file(workbook, "B", sys.argv[1], 0)
+parse_gra_file(workbook, "C", sys.argv[2], 4)
+parse_gra_file(workbook, "D", sys.argv[3], 8)
+
+for city in cities:
+	create_graph(workbook, city, "T000")
+	create_graph(workbook, city, "T020")
+	create_graph(workbook, city, "T100")
 
 workbook.close()
 
 print ("end..")
+
+print cities
