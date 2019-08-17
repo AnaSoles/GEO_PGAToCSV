@@ -106,7 +106,118 @@ def parse_dat_file(filename):
 		if (len(split_line) == 4) and (split_line[3]=='gals'):
 			intensities.append((float)(split_line[0]))
 
+fpga_values = [0.1, 0.2, 0.3, 0.4, 0.5]
+fpga_matching = [
+	# 0.1
+	{
+	"B" : 1.0,
+	"C" : 1.2,
+	"D" : 1.6,
+	},
+	# 0.2
+	{
+	"B" : 1.0,
+	"C" : 1.2,
+	"D" : 1.4,
+	},
+	# 0.3
+	{
+	"B" : 1.0,
+	"C" : 1.1,
+	"D" : 1.2,
+	},
+	# 0.4
+	{
+	"B" : 1.0,
+	"C" : 1.0,
+	"D" : 1.1,
+	},
+	# 0.5
+	{
+	"B" : 1.0,
+	"C" : 1.0,
+	"D" : 1.0,
+	}
+]
 
+Fa_values = [0.25, 0.50, 0.75, 1.0, 1.25]
+Fa_matching = fpga_matching # same table as fpga
+
+Fv_values = [0.10, 0.20, 0.30, 0.40, 0.50]
+Fv_matching = [
+	# 0.1
+	{
+	"B" : 1.0,
+	"C" : 1.7,
+	"D" : 2.4,
+	},
+	# 0.2
+	{
+	"B" : 1.0,
+	"C" : 1.6,
+	"D" : 2.0,
+	},
+	# 0.3
+	{
+	"B" : 1.0,
+	"C" : 1.5,
+	"D" : 1.8,
+	},
+	# 0.4
+	{
+	"B" : 1.0,
+	"C" : 1.4,
+	"D" : 1.6,
+	},
+	# 0.5
+	{
+	"B" : 1.0,
+	"C" : 1.3,
+	"D" : 1.5,
+	}
+]
+
+def low_value(value, ref_values):
+	if (value<=ref_values[0]):
+		return ref_values[0]
+	for i in range(1, len(ref_values)):
+		#print str(i) + " -> " + str(ref_values[i-1])
+		if (value < ref_values[i]):
+			return ref_values[i-1];
+	return ref_values[len(ref_values)-1]
+
+def up_value(value, ref_values):
+	if (value>=ref_values[len(ref_values)-1]):
+		return ref_values[len(ref_values)-1]
+	for i in range(1, len(ref_values) + 1):
+		#print str(len(ref_values)-i) + " -> " + str(ref_values[len(ref_values)-i])
+		if (value > ref_values[len(ref_values)-i]):
+			return ref_values[len(ref_values)-i + 1];
+	return ref_values[0]
+
+def compute_value(value, ref_values, matching_values, category):
+	
+	result = -1
+
+	value_low = low_value(value, ref_values)
+	index_value_low = ref_values.index(value_low)
+	value_low_result = matching_values[index_value_low][category]
+
+	value_up = up_value(value, ref_values)
+	index_value_up = ref_values.index(value_up)
+	value_up_result = matching_values[index_value_up][category]
+
+	# print "value " + str(value)
+	# print "value_low " + str(value_low) 
+	# print "value_up " + str(value_up) 
+	# print "value_low_result " + str(value_low_result) 
+	# print "value_up_result " + str(value_up_result) 
+
+	if ((value_up-value_low) == 0):
+		result = value_low_result
+	else:
+		result = value_low_result + ((value-value_low) * (value_up_result-value_low_result)) / (value_up-value_low)
+	return result
 
 def parse_map_file(workbook, category, filename, current_column):
 	gra_file = open(filename, "r")
@@ -158,9 +269,28 @@ def parse_map_file(workbook, category, filename, current_column):
 						current_sheet.write(0, 1 , "ROCK_B")
 						current_sheet.write(0, 2 , "ROCK_C")
 						current_sheet.write(0, 3 , "ROCK_D")
+						current_sheet.write(0, 6 , "fpga B")
+						current_sheet.write(0, 7 , "fpga C")
+						current_sheet.write(0, 8 , "fpga D")
+						current_sheet.write(0, 10 , "Fa B")
+						current_sheet.write(0, 11 , "Fa C")
+						current_sheet.write(0, 12 , "Fa D")
+						current_sheet.write(0, 14 , "Fv B")
+						current_sheet.write(0, 15 , "Fv C")
+						current_sheet.write(0, 16 , "Fv D")
 					if (current_column == 1):
 						current_sheet.write(curent_line, 0, intensities[curent_line-1])
 					current_sheet.write(curent_line, current_column ,(float)(split_line[RP+1]))
+
+					# compute PGA values
+					intensity = intensities[curent_line-1]
+					intensities_to_print = [0.0, 0.2, 1.0]
+					if (intensity in intensities_to_print):
+						scales = [fpga_values, Fa_values, Fv_values]
+						matchings = [fpga_matching, Fa_matching, Fv_matching]
+						intensity_index = intensities_to_print.index(intensity)
+						fPGA = compute_value((float)(split_line[RP+1])/981.0, scales[intensity_index], matchings[intensity_index], category)
+						current_sheet.write(1, 5 + current_column + (intensity_index*4), fPGA)
 				curent_line = curent_line + 1
 	return curent_line
 
@@ -189,6 +319,20 @@ workbook = xlsxwriter.Workbook('MAP_AMSV.xlsx')
 #sheet_amsv1.write(2,0,"value1")
 #sheet_amsv2.write(2,0,"value2")
 
+# print low_value(0.60, fpga_values)
+# print low_value(0.55, fpga_values)
+# print low_value(0.50, fpga_values)
+# print low_value(0.45, fpga_values)
+# print low_value(0.40, fpga_values)
+# print low_value(0.35, fpga_values)
+# print low_value(0.30, fpga_values)
+# print low_value(0.25, fpga_values)
+# print low_value(0.20, fpga_values)
+# print low_value(0.15, fpga_values)
+# print low_value(0.10, fpga_values)
+# print low_value(0.05, fpga_values)
+#print compute_value(0.35, fpga_values, fpga_matching, "D")
+#exit(0)
 # open input file
 parse_dat_file(sys.argv[4])
 if (len(intensities)==0):
