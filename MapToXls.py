@@ -7,26 +7,32 @@ import xlsxwriter
 # 							Create graph for excel
 #------------------------------------------------------------------------------------
 
-cities = [];
+# global variables defines
+intensities = []
 
+# def means function
 def create_graphs(workbook, nblines):
 
 	for worksheet in workbook.worksheets():
 
 		# Create a chart object. Type is kind of graph, scatter is line
-		chart = workbook.add_chart({'type': 'line'})
+		chart = workbook.add_chart({'type': 'scatter',
+									'subtype': 'smooth'})
 
 		# # Configure the series of the chart from the dataframe data.
 		chart.add_series({
 			'name': "B",
+		 	# X value
+		 	'categories': [worksheet.name, 1, 0, nblines, 0],
 		 	# Y value
 		 	'values': [worksheet.name, 1, 1, nblines, 1],
-
 		 	'marker': {'type': 'automatic'},
 		 	'line':   {'width': 1.5},
 		})
 		chart.add_series({
 			'name': "C",
+		 	# X value
+		 	'categories': [worksheet.name, 1, 0, nblines, 0],
 		 	# Y value
 		 	'values': [worksheet.name, 1, 2, nblines, 2],
 
@@ -35,6 +41,8 @@ def create_graphs(workbook, nblines):
 		})
 		chart.add_series({
 			'name': "D",
+		 	# X value
+		 	'categories': [worksheet.name, 1, 0, nblines, 0],
 		 	# Y value
 		 	'values': [worksheet.name, 1, 3, nblines, 3],
 
@@ -52,7 +60,8 @@ def create_graphs(workbook, nblines):
 	        						'visible': True,
 	        						'line': {'width': 0.01}
 	    				            },
- 						   'num_format': '0.00'
+ 						   'num_format': '0.00',
+					       'max' : max(intensities),
 						})
 		chart.set_y_axis({'name': 'Frecuencia Anual de Excedencia (1/anos)',
 						  'major_gridlines': {
@@ -73,16 +82,31 @@ def create_graphs(workbook, nblines):
 		# print("***********" + worksheet.name)
 		worksheet.insert_chart(nblines + 2, 3, chart)
 
-def add_city(city):
-	global cities
-	if (city not in cities):
-		cities.append(city)
-
 def reduce_name(city, footer):
 	# sheet name cannot be greater than 30 characters.
 	result = city[:30-len(footer)-len("_")]
 	result = result +'_'+ footer
 	return result;
+
+def parse_dat_file(filename):
+	gra_file = open(filename, "r")
+
+	# we store the intensities valules into a global variable intensities table
+	global intensities;
+
+	#--------------------  LOOP FOR EACH LINE IN THE .MAP FILE TO FIND INTENSITIES VALES FOR UHS ----------------------------------
+	#loop until end of file
+	while True:
+		line = gra_file.readline()
+		if len(line) == 0:
+			break
+
+		split_line=(line.rstrip().split(","))
+
+		if (len(split_line) == 4) and (split_line[3]=='gals'):
+			intensities.append((float)(split_line[0]))
+
+
 
 def parse_map_file(workbook, category, filename, current_column):
 	gra_file = open(filename, "r")
@@ -110,14 +134,12 @@ def parse_map_file(workbook, category, filename, current_column):
 		if (len(split_line)>1):
 			if (split_line[0] == "RP"):
 				for RP in range(0,5):
-					print split_line
 					rp_map.append(split_line[RP+1])
 
 		# city line
 		if (len(split_line)>9):
 			read_city = split_line[9]
 			must_print = True;
-			print read_city
 			if (CITY != read_city):
 				CITY = read_city
 				curent_line = 1;
@@ -137,7 +159,7 @@ def parse_map_file(workbook, category, filename, current_column):
 						current_sheet.write(0, 2 , "ROCK_C")
 						current_sheet.write(0, 3 , "ROCK_D")
 					if (current_column == 1):
-						current_sheet.write(curent_line, 0,(int)(split_line[0]))
+						current_sheet.write(curent_line, 0, intensities[curent_line-1])
 					current_sheet.write(curent_line, current_column ,(float)(split_line[RP+1]))
 				curent_line = curent_line + 1
 	return curent_line
@@ -152,9 +174,9 @@ def parse_map_file(workbook, category, filename, current_column):
 print( 'Number of arguments:', len(sys.argv), 'arguments.')
 print( 'Argument List:', str(sys.argv))
 
-if (len(sys.argv)<4):
+if (len(sys.argv)<5):
 	print "Error - wrong parameters"
-	print "Usage: " + sys.argv[0] + " GRA_B.map GRA_C.map GRA_D.map"
+	print "Usage (example): " + sys.argv[0] + " GRA_B.map GRA_C.map GRA_D.map GRA_B.dat"
 	exit(1)
 
 # 11 Create a excel Sheet - WORKBOOK 
@@ -168,6 +190,11 @@ workbook = xlsxwriter.Workbook('MAP_AMSV.xlsx')
 #sheet_amsv2.write(2,0,"value2")
 
 # open input file
+parse_dat_file(sys.argv[4])
+if (len(intensities)==0):
+	print("ERROR: No gals unit found in .dat file !!!")
+	exit(1)
+print("Found " + str(len(intensities)) + " in dat files.")
 nblines = parse_map_file(workbook, "B", sys.argv[1], 1)
 nblines = parse_map_file(workbook, "C", sys.argv[2], 2)
 nblines = parse_map_file(workbook, "D", sys.argv[3], 3)
@@ -177,5 +204,3 @@ create_graphs(workbook, nblines)
 workbook.close()
 
 print ("end..")
-
-print cities
