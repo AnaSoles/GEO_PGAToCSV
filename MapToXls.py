@@ -269,28 +269,30 @@ def parse_map_file(workbook, category, filename, current_column):
 						current_sheet.write(0, 1 , "ROCK_B")
 						current_sheet.write(0, 2 , "ROCK_C")
 						current_sheet.write(0, 3 , "ROCK_D")
-						current_sheet.write(0, 6 , "fpga B")
-						current_sheet.write(0, 7 , "fpga C")
-						current_sheet.write(0, 8 , "fpga D")
-						current_sheet.write(0, 10 , "Fa B")
-						current_sheet.write(0, 11 , "Fa C")
-						current_sheet.write(0, 12 , "Fa D")
-						current_sheet.write(0, 14 , "Fv B")
-						current_sheet.write(0, 15 , "Fv C")
-						current_sheet.write(0, 16 , "Fv D")
+						current_sheet.write(0, 6 , "ROCK B")
+						current_sheet.write(0, 7 , "ROCK C")
+						current_sheet.write(0, 8 , "ROCK D")
 					if (current_column == 1):
 						current_sheet.write(curent_line, 0, intensities[curent_line-1])
+						current_sheet.write(1, 5, "PGA")
+						current_sheet.write(2, 5, "Ss")
+						current_sheet.write(3, 5, "Sd")
+						current_sheet.write(4, 5, "Fpga")
+						current_sheet.write(5, 5, "Fa")
+						current_sheet.write(6, 5, "Fv")
 					current_sheet.write(curent_line, current_column ,(float)(split_line[RP+1]))
 
-					# compute PGA values
+					# compute values
 					intensity = intensities[curent_line-1]
 					intensities_to_print = [0.0, 0.2, 1.0]
 					if (intensity in intensities_to_print):
+						intensity_index = intensities_to_print.index(intensity)
+						value981 = ((float)(split_line[RP+1]))/981.0
+						current_sheet.write(intensity_index + 1, 5 + current_column, value981)
 						scales = [fpga_values, Fa_values, Fv_values]
 						matchings = [fpga_matching, Fa_matching, Fv_matching]
-						intensity_index = intensities_to_print.index(intensity)
-						fPGA = compute_value((float)(split_line[RP+1])/981.0, scales[intensity_index], matchings[intensity_index], category)
-						current_sheet.write(1, 5 + current_column + (intensity_index*4), fPGA)
+						interpolated_value = compute_value(value981, scales[intensity_index], matchings[intensity_index], category)
+						current_sheet.write(intensity_index + 4, 5 + current_column, interpolated_value)
 				curent_line = curent_line + 1
 	return curent_line
 
