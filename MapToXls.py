@@ -35,7 +35,6 @@ def create_graphs(workbook, nblines):
 		 	'categories': [worksheet.name, 1, 0, nblines, 0],
 		 	# Y value
 		 	'values': [worksheet.name, 1, 2, nblines, 2],
-
 		 	'marker': {'type': 'automatic'},
 		 	'line':   {'width': 1.5},
 		})
@@ -45,7 +44,6 @@ def create_graphs(workbook, nblines):
 		 	'categories': [worksheet.name, 1, 0, nblines, 0],
 		 	# Y value
 		 	'values': [worksheet.name, 1, 3, nblines, 3],
-
 		 	'marker': {'type': 'automatic'},
 		 	'line':   {'width': 1.5},
 		})
@@ -79,8 +77,73 @@ def create_graphs(workbook, nblines):
 		chart.set_style(10)
 
 		# # # Insert the chart into the worksheet.
-		# print("***********" + worksheet.name)
-		worksheet.insert_chart(nblines + 2, 3, chart)
+		worksheet.insert_chart(2, 10, chart)
+
+def create_graphs_2(workbook, nblines):
+
+	for worksheet in workbook.worksheets():
+
+		# Create a chart object. Type is kind of graph, scatter is line
+		chart = workbook.add_chart({'type': 'scatter',
+									'subtype': 'smooth'})
+		# # Configure the series of the chart from the dataframe data.
+		chart.add_series({
+			'name': "B",
+		 	# X value
+		 	'categories': [worksheet.name, nblines + 3, 0, nblines + 3 + (int)(4.0/0.1), 0],
+		 	# Y value
+		 	'values': [worksheet.name, nblines + 3, 1, nblines + 3 + (int)(4.0/0.1), 1],
+		 	'marker': {'type': 'automatic'},
+		 	'line':   {'width': 1.5},
+		})
+		chart.add_series({
+			'name': "C",
+		 	# X value
+		 	'categories': [worksheet.name, nblines + 3, 3, nblines + 3 + (int)(4.0/0.1), 3],
+		 	# Y value
+		 	'values': [worksheet.name, nblines + 3, 4, nblines + 3 + (int)(4.0/0.1), 4],
+		 	'marker': {'type': 'automatic'},
+		 	'line':   {'width': 1.5},
+		})
+		chart.add_series({
+			'name': "D",
+		 	# X value
+		 	'categories': [worksheet.name, nblines + 3, 6, nblines + 3 + (int)(4.0/0.1), 6],
+		 	# Y value
+		 	'values': [worksheet.name, nblines + 3, 7, nblines + 3 + (int)(4.0/0.1), 7],
+		 	'marker': {'type': 'automatic'},
+		 	'line':   {'width': 1.5},
+		})
+		# Add a chart title and some axis labels.
+		chart.set_title ({'name': 'CURVAS DE PROBABILIDAD DE EXCEDENCIA '})
+		chart.set_x_axis({'name': 'Aceleracion Spectral (gals)',
+						  'major_gridlines': {
+	        						'visible': True,
+	        						'line': {'width': 0.1}
+	    				            },
+	    				   'minor_gridlines': {
+	        						'visible': True,
+	        						'line': {'width': 0.01}
+	    				            },
+ 						   'num_format': '0.00',
+						})
+		chart.set_y_axis({'name': 'Frecuencia Anual de Excedencia (1/anos)',
+						  'major_gridlines': {
+	        						'visible': True,
+	        						'line': {'width': 0.1}
+	    				            },
+	    				   'minor_gridlines': {
+	        						'visible': True,
+	        						'line': {'width': 0.01}
+	    				            },
+	    				   'num_format': '0.00',
+						  })
+
+		# Set an Excel chart style. Colors with white outline and shadow.
+		chart.set_style(10)
+
+		# # # Insert the chart into the worksheet.
+		worksheet.insert_chart(24, 10, chart)
 
 def reduce_name(city, footer):
 	# sheet name cannot be greater than 30 characters.
@@ -280,6 +343,25 @@ def parse_map_file(workbook, category, filename, current_column):
 						current_sheet.write(4, 5, "Fpga")
 						current_sheet.write(5, 5, "Fa")
 						current_sheet.write(6, 5, "Fv")
+						current_sheet.write(7, 5, "As")
+						current_sheet.write(8, 5, "Sds")
+						current_sheet.write(9, 5, "Sd1")
+						# T0 -> formula
+						current_sheet.write(10, 5, "T0")
+						current_sheet.write(10, 6, "=0.2*G10/G9")
+						current_sheet.write(10, 7, "=0.2*H10/H9")
+						current_sheet.write(10, 8, "=0.2*I10/I9")
+						# Ts -> formula
+						current_sheet.write(11, 5, "Ts")
+						current_sheet.write(11, 6, "=G10/G9")
+						current_sheet.write(11, 7, "=H10/H9")
+						current_sheet.write(11, 8, "=I10/I9")
+						# Tltl -> constant
+						current_sheet.write(12, 5, "Tltl")
+						current_sheet.write(12, 6, 4.0)
+						current_sheet.write(12, 7, 4.0)
+						current_sheet.write(12, 8, 4.0)
+
 					current_sheet.write(curent_line, current_column ,(float)(split_line[RP+1]))
 
 					# compute values
@@ -287,14 +369,52 @@ def parse_map_file(workbook, category, filename, current_column):
 					intensities_to_print = [0.0, 0.2, 1.0]
 					if (intensity in intensities_to_print):
 						intensity_index = intensities_to_print.index(intensity)
+						# values / 981
 						value981 = ((float)(split_line[RP+1]))/981.0
 						current_sheet.write(intensity_index + 1, 5 + current_column, value981)
+						# fpga, fa, fv
 						scales = [fpga_values, Fa_values, Fv_values]
 						matchings = [fpga_matching, Fa_matching, Fv_matching]
 						interpolated_value = compute_value(value981, scales[intensity_index], matchings[intensity_index], category)
 						current_sheet.write(intensity_index + 4, 5 + current_column, interpolated_value)
+						# As / Sds / Sd1
+						AsSdsSd1 = interpolated_value * value981;
+						current_sheet.write(intensity_index + 7, 5 + current_column, AsSdsSd1)
+
 				curent_line = curent_line + 1
 	return curent_line
+
+def create_AASHTO_table(current_sheet, line, column, category):
+	# header
+	current_sheet.write(line, column, "Rock " + category)
+	line  = line + 1
+	current_sheet.write(line, column, "Tm (seg)")
+	current_sheet.write(line, column + 1, "Cm (-)")
+	line  = line + 1
+	T = 0.0
+	cell_format = workbook.add_format()
+	cell_format.num_format = '0.00'
+	categoryToColumn = {
+		"B":"G",
+		"C":"H",
+		"D":"I"
+	}
+	Asline =  "8"
+	Sdsline = "9"
+	Sd1line = "10"
+	T0line  = "11"
+	Tsline  = "12"
+	while (T <= 4.1):
+		current_sheet.write(line, column, T, cell_format)
+		T0  = "{}{}".format(categoryToColumn[category], T0line)
+		Ts  = "{}{}".format(categoryToColumn[category], Tsline)
+		Sds = "{}{}".format(categoryToColumn[category], Sdsline)
+		Sd1 = "{}{}".format(categoryToColumn[category], Sd1line)
+		As  = "{}{}".format(categoryToColumn[category], Asline)
+		formula = "=IF({}<{},({}-{})*({}/{})+{},IF({}>={},{}/{},{}))".format(T,T0,Sds,As,T,T0,As,T,Ts,Sd1,T,Sds)
+		current_sheet.write(line, column + 1, formula, cell_format)
+		line = line + 1
+		T = T + 0.1
 
 #------------------------------------------------------------------------------------
 #------------------------------------------------------------------------------------
@@ -345,7 +465,14 @@ nblines = parse_map_file(workbook, "B", sys.argv[1], 1)
 nblines = parse_map_file(workbook, "C", sys.argv[2], 2)
 nblines = parse_map_file(workbook, "D", sys.argv[3], 3)
 
+
+for worksheet in workbook.worksheets():
+	create_AASHTO_table(worksheet, nblines + 1, 0 ,"B")
+	create_AASHTO_table(worksheet, nblines + 1, 3 ,"C")
+	create_AASHTO_table(worksheet, nblines + 1, 6 ,"D")
+
 create_graphs(workbook, nblines)
+create_graphs_2(workbook, nblines)
 
 workbook.close()
 
