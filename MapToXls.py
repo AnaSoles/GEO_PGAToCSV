@@ -4,7 +4,7 @@ import sys
 import xlsxwriter
 
 #------------------------------------------------------------------------------------
-# 							Create graph for excel
+# 							Create UHS graph for excel
 #------------------------------------------------------------------------------------
 
 # global variables defines
@@ -21,38 +21,40 @@ def create_graphs(workbook, nblines):
 
 		# # Configure the series of the chart from the dataframe data.
 		chart.add_series({
-			'name': "B",
+			'name': "Roca_Tipo_B",
 		 	# X value
 		 	'categories': [worksheet.name, 1, 0, nblines, 0],
 		 	# Y value
 		 	'values': [worksheet.name, 1, 1, nblines, 1],
-		 	'marker': {'type': 'automatic'},
+		 	'marker': {'type': 'diamond', 'size': 5},
 		 	'line':   {'width': 1.5},
 		})
 		chart.add_series({
-			'name': "C",
+			'name': "Suelo_Tipo_C",
 		 	# X value
 		 	'categories': [worksheet.name, 1, 0, nblines, 0],
 		 	# Y value
 		 	'values': [worksheet.name, 1, 2, nblines, 2],
-		 	'marker': {'type': 'automatic'},
+		 	'marker': {'type': 'diamond', 'size': 5},
 		 	'line':   {'width': 1.5},
 		})
 		chart.add_series({
-			'name': "D",
+			'name': "Suelo_Tipo_D",
 		 	# X value
 		 	'categories': [worksheet.name, 1, 0, nblines, 0],
 		 	# Y value
 		 	'values': [worksheet.name, 1, 3, nblines, 3],
-		 	'marker': {'type': 'automatic'},
+		 	'marker': {'type': 'diamond', 'size': 5},
 		 	'line':   {'width': 1.5},
 		})
 		# Add a chart title and some axis labels.
-		chart.set_title ({'name': 'CURVAS DE PROBABILIDAD DE EXCEDENCIA '})
-		chart.set_x_axis({'name': 'Aceleracion Spectral (gals)',
+		chart.set_title ({'name': 'ESPECTROS DE PELIGRO UNIFORME (UHS)'})
+		chart.set_size({'width': 600, 'height': 350})
+		chart.set_x_axis({'name': 'Period (s)',
+						'name_font':  {'name': 'Arial', 'size': 10},
 						  'major_gridlines': {
 	        						'visible': True,
-	        						'line': {'width': 0.1}
+	        						'line': {'width': 0.15}
 	    				            },
 	    				   'minor_gridlines': {
 	        						'visible': True,
@@ -60,11 +62,13 @@ def create_graphs(workbook, nblines):
 	    				            },
  						   'num_format': '0.00',
 					       'max' : max(intensities),
+					       'num_font':  {'name': 'Arial', 'size': 7},
 						})
-		chart.set_y_axis({'name': 'Frecuencia Anual de Excedencia (1/anos)',
+		chart.set_y_axis({'name': 'Aceleracion Spectral (gals)',
+						'name_font':  {'name': 'Arial', 'size': 12},
 						  'major_gridlines': {
 	        						'visible': True,
-	        						'line': {'width': 0.1}
+	        						'line': {'width': 0.15}
 	    				            },
 	    				   'minor_gridlines': {
 	        						'visible': True,
@@ -85,38 +89,40 @@ def create_graphs_2(workbook, nblines):
 
 		# Create a chart object. Type is kind of graph, scatter is line
 		chart = workbook.add_chart({'type': 'scatter',
-									'subtype': 'smooth'})
+									'subtype': 'straight'})
 		# # Configure the series of the chart from the dataframe data.
 		chart.add_series({
-			'name': "B",
+			'name': "Roca_Tipo_B",
 		 	# X value
 		 	'categories': [worksheet.name, nblines + 3, 0, nblines + 3 + (int)(4.0/0.1), 0],
 		 	# Y value
 		 	'values': [worksheet.name, nblines + 3, 1, nblines + 3 + (int)(4.0/0.1), 1],
-		 	'marker': {'type': 'automatic'},
+		 	'marker': {'type': 'none'},
 		 	'line':   {'width': 1.5},
 		})
 		chart.add_series({
-			'name': "C",
+			'name': "Suelo_Tipo_C",
 		 	# X value
 		 	'categories': [worksheet.name, nblines + 3, 3, nblines + 3 + (int)(4.0/0.1), 3],
 		 	# Y value
 		 	'values': [worksheet.name, nblines + 3, 4, nblines + 3 + (int)(4.0/0.1), 4],
-		 	'marker': {'type': 'automatic'},
+		 	'marker': {'type': 'none'},
 		 	'line':   {'width': 1.5},
 		})
 		chart.add_series({
-			'name': "D",
+			'name': "Suelo_Tipo_D",
 		 	# X value
 		 	'categories': [worksheet.name, nblines + 3, 6, nblines + 3 + (int)(4.0/0.1), 6],
 		 	# Y value
 		 	'values': [worksheet.name, nblines + 3, 7, nblines + 3 + (int)(4.0/0.1), 7],
-		 	'marker': {'type': 'automatic'},
+		 	'marker': {'type': 'none'},
 		 	'line':   {'width': 1.5},
 		})
 		# Add a chart title and some axis labels.
-		chart.set_title ({'name': 'CURVAS DE PROBABILIDAD DE EXCEDENCIA '})
-		chart.set_x_axis({'name': 'Aceleracion Spectral (gals)',
+		chart.set_title ({'name': 'ESPECTROS DE DISENO GENERICO HORIZONTALES AASHTO'})
+		chart.set_size({'width': 600, 'height': 350})
+		chart.set_x_axis({'name': 'Period (s)',
+						'name_font':  {'name': 'Arial', 'size': 10},
 						  'major_gridlines': {
 	        						'visible': True,
 	        						'line': {'width': 0.1}
@@ -127,7 +133,8 @@ def create_graphs_2(workbook, nblines):
 	    				            },
  						   'num_format': '0.00',
 						})
-		chart.set_y_axis({'name': 'Frecuencia Anual de Excedencia (1/anos)',
+		chart.set_y_axis({'name': 'Aceleracion Spectral (gals)',
+						'name_font':  {'name': 'Arial', 'size': 12},
 						  'major_gridlines': {
 	        						'visible': True,
 	        						'line': {'width': 0.1}
@@ -297,6 +304,16 @@ def parse_map_file(workbook, category, filename, current_column):
 
 	#--------------------  LOOP FOR EACH LINE IN THE .GRA FILE----------------------------------
 	#loop until end of file
+	
+	# Cell color for header names
+	cell_format = workbook.add_format({'bold': True, 'font_color': 'white'})
+	cell_format.set_bg_color('#004C99')
+	cell_format.set_text_wrap()
+	cell_format.set_center_across()
+	#cell_format.num_format = '0.00'
+	cell_format_2 = workbook.add_format()
+	cell_format_2.num_format = '0.00'
+	cell_format_2.set_center_across()
 	while True:
 		line = gra_file.readline()
 		if len(line) == 0:
@@ -328,41 +345,41 @@ def parse_map_file(workbook, category, filename, current_column):
 					current_sheet = workbook.get_worksheet_by_name(worksheet_name);
 					if (current_sheet==None):
 						current_sheet = workbook.add_worksheet(worksheet_name)
-						current_sheet.write(0, 0 , "Period")
-						current_sheet.write(0, 1 , "ROCK_B")
-						current_sheet.write(0, 2 , "ROCK_C")
-						current_sheet.write(0, 3 , "ROCK_D")
-						current_sheet.write(0, 6 , "ROCK B")
-						current_sheet.write(0, 7 , "ROCK C")
-						current_sheet.write(0, 8 , "ROCK D")
+						current_sheet.write(0, 0 , "Period (s)", cell_format)
+						current_sheet.write(0, 1 , "Intensity_Tipo_B (gals)", cell_format)
+						current_sheet.write(0, 2 , "Intensity_Tipo_C (gals)", cell_format)
+						current_sheet.write(0, 3 , "Intensity_Tipo_D (gals)", cell_format)
+						current_sheet.write(0, 6 , "Tipo_B", cell_format)
+						current_sheet.write(0, 7 , "Tipo_C", cell_format)
+						current_sheet.write(0, 8 , "Tipo_D", cell_format)
 					if (current_column == 1):
-						current_sheet.write(curent_line, 0, intensities[curent_line-1])
-						current_sheet.write(1, 5, "PGA")
-						current_sheet.write(2, 5, "Ss")
-						current_sheet.write(3, 5, "Sd")
-						current_sheet.write(4, 5, "Fpga")
-						current_sheet.write(5, 5, "Fa")
-						current_sheet.write(6, 5, "Fv")
-						current_sheet.write(7, 5, "As")
-						current_sheet.write(8, 5, "Sds")
-						current_sheet.write(9, 5, "Sd1")
+						current_sheet.write(curent_line, 0, intensities[curent_line-1], cell_format_2)
+						current_sheet.write(1, 5, "PGA", cell_format)
+						current_sheet.write(2, 5, "Ss", cell_format)
+						current_sheet.write(3, 5, "Sd", cell_format)
+						current_sheet.write(4, 5, "Fpga", cell_format)
+						current_sheet.write(5, 5, "Fa", cell_format)
+						current_sheet.write(6, 5, "Fv", cell_format)
+						current_sheet.write(7, 5, "As", cell_format)
+						current_sheet.write(8, 5, "Sds", cell_format)
+						current_sheet.write(9, 5, "Sd1", cell_format)
 						# T0 -> formula
-						current_sheet.write(10, 5, "T0")
-						current_sheet.write(10, 6, "=0.2*G10/G9")
-						current_sheet.write(10, 7, "=0.2*H10/H9")
-						current_sheet.write(10, 8, "=0.2*I10/I9")
+						current_sheet.write(10, 5, "T0", cell_format)
+						current_sheet.write(10, 6, "=0.2*G10/G9", cell_format_2)
+						current_sheet.write(10, 7, "=0.2*H10/H9", cell_format_2)
+						current_sheet.write(10, 8, "=0.2*I10/I9", cell_format_2)
 						# Ts -> formula
-						current_sheet.write(11, 5, "Ts")
-						current_sheet.write(11, 6, "=G10/G9")
-						current_sheet.write(11, 7, "=H10/H9")
-						current_sheet.write(11, 8, "=I10/I9")
+						current_sheet.write(11, 5, "Ts", cell_format)
+						current_sheet.write(11, 6, "=G10/G9", cell_format_2)
+						current_sheet.write(11, 7, "=H10/H9", cell_format_2)
+						current_sheet.write(11, 8, "=I10/I9", cell_format_2)
 						# Tltl -> constant
-						current_sheet.write(12, 5, "Tltl")
-						current_sheet.write(12, 6, 4.0)
-						current_sheet.write(12, 7, 4.0)
-						current_sheet.write(12, 8, 4.0)
+						current_sheet.write(12, 5, "Tltl", cell_format)
+						current_sheet.write(12, 6, 4.0, cell_format_2)
+						current_sheet.write(12, 7, 4.0, cell_format_2)
+						current_sheet.write(12, 8, 4.0, cell_format_2)
 
-					current_sheet.write(curent_line, current_column ,(float)(split_line[RP+1]))
+					current_sheet.write(curent_line, current_column ,(float)(split_line[RP+1]),cell_format_2)
 
 					# compute values
 					intensity = intensities[curent_line-1]
@@ -371,29 +388,35 @@ def parse_map_file(workbook, category, filename, current_column):
 						intensity_index = intensities_to_print.index(intensity)
 						# values / 981
 						value981 = ((float)(split_line[RP+1]))/981.0
-						current_sheet.write(intensity_index + 1, 5 + current_column, value981)
+						current_sheet.write(intensity_index + 1, 5 + current_column, value981, cell_format_2)
 						# fpga, fa, fv
 						scales = [fpga_values, Fa_values, Fv_values]
 						matchings = [fpga_matching, Fa_matching, Fv_matching]
 						interpolated_value = compute_value(value981, scales[intensity_index], matchings[intensity_index], category)
-						current_sheet.write(intensity_index + 4, 5 + current_column, interpolated_value)
+						current_sheet.write(intensity_index + 4, 5 + current_column, interpolated_value, cell_format_2)
 						# As / Sds / Sd1
 						AsSdsSd1 = interpolated_value * value981;
-						current_sheet.write(intensity_index + 7, 5 + current_column, AsSdsSd1)
+						current_sheet.write(intensity_index + 7, 5 + current_column, AsSdsSd1, cell_format_2)
 
 				curent_line = curent_line + 1
 	return curent_line
 
 def create_AASHTO_table(current_sheet, line, column, category):
 	# header
-	current_sheet.write(line, column, "Rock " + category)
+	# Cell color for header names
+	cell_format_1 = workbook.add_format({'bold': True, 'font_color': 'white'})
+	cell_format_1.set_bg_color('blue')
+	cell_format_1.set_center_across()
+	#
+	current_sheet.write(line, column, "Rock " + category,cell_format_1)
 	line  = line + 1
-	current_sheet.write(line, column, "Tm (seg)")
-	current_sheet.write(line, column + 1, "Cm (-)")
+	current_sheet.write(line, column, "Tm (seg)",cell_format_1)
+	current_sheet.write(line, column + 1, "Cm (-)",cell_format_1)
 	line  = line + 1
 	T = 0.0
 	cell_format = workbook.add_format()
 	cell_format.num_format = '0.00'
+	cell_format.set_center_across()
 	categoryToColumn = {
 		"B":"G",
 		"C":"H",
