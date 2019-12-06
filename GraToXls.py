@@ -18,8 +18,13 @@ cities = [];
 # footer = worksheet label name
 # nblines = nb of lines in the map file
 
-# 						GRAPH FUNCTION                                 
-def create_graph(workbook, city, footer, nblines): 								#
+# 						GRAPH FUNCTION    
+#  function: create_graph
+#  parameter of function : workbook, city, footer, nblines, y_min, y_max
+#  y_min, y_max per each Period T000 - T020 - T100 - In order to be able to modify min max ranges
+def create_graph(workbook, city, footer, nblines, y_min, y_max): 		
+
+						#
 
 	worksheet = workbook.get_worksheet_by_name(reduce_name(city, footer));
 	worksheet.set_column(1, 11, 11)
@@ -63,6 +68,9 @@ def create_graph(workbook, city, footer, nblines): 								#
 	})
 
 	# Add a chart title and some axis labels.
+	
+
+	
 	chart.set_title ({'name': 'CURVAS DE PROBABILIDAD DE EXCEDENCIA '})
 	chart.set_size({'width': 800, 'height': 400})
 	chart.set_x_axis({'name': 'Aceleracion Spectral (gals)',
@@ -81,8 +89,8 @@ def create_graph(workbook, city, footer, nblines): 								#
 					  'num_format': '0.00'
 					})
 	chart.set_y_axis({'name': 'Frecuencia Anual de Excedencia (1/anos)',
-					  'min' : 0.001,
-					  'max' : 10,
+					  'min' : y_min,
+					  'max' : y_max,
 					  'log_base': 10,
 					  'crossing': 0.001,
 					  'major_gridlines': {
@@ -98,6 +106,7 @@ def create_graph(workbook, city, footer, nblines): 								#
 
 	# Set an Excel chart style. Colors with white outline and shadow.
 	chart.set_style(10)
+
 
 	# # # Insert the chart into the worksheet.
 	# print("***********" + worksheet.name)
@@ -258,9 +267,9 @@ nblines = parse_gra_file(workbook, "D", sys.argv[3], 8)
 
 for city in cities:
 	# Function called 
-	create_graph(workbook, city, "T000", nblines)
-	create_graph(workbook, city, "T020", nblines)
-	create_graph(workbook, city, "T100", nblines)
+	create_graph(workbook, city, "T000", nblines, 0.001, 10 )
+	create_graph(workbook, city, "T020", nblines, 0.03, 10 )
+	create_graph(workbook, city, "T100", nblines, 0.01, 10 )
 
 workbook.close()
 
